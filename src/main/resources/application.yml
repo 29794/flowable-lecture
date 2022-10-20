@@ -1,0 +1,7 @@
+server:
+  shutdown: graceful
+spring:
+  application:
+    name: flowable-lecture
+  profiles:
+    active: dev
