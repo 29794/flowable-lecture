@@ -1,10 +1,10 @@
 package com.ly.flowable;
 
 // @SpringBootApplication
-// public class FlowableLectureApplication {
+// public class FlowableDemoApplication {
 //
 //     public static void main(String[] args) {
-//         SpringApplication.run(FlowableLectureApplication.class, args);
+//         SpringApplication.run(FlowableDemoApplication.class, args);
 //     }
 //
 // }
