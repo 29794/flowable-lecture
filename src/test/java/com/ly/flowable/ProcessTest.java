@@ -1,16 +1,16 @@
 package com.ly.flowable;
 
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.RuntimeService;
+import org.flowable.engine.*;
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -99,6 +99,109 @@ public class ProcessTest {
         System.out.println("流程定义的ID：" + processInstance.getProcessDefinitionId());
         System.out.println("流程实例的ID：" + processInstance.getId());
         System.out.println("当前活动的ID：" + processInstance.getActivityId());
+    }
+
+    /**
+     * 查看任务
+     */
+    @Test
+    public void testQueryTask(){
+        // 配置数据库相关信息 获取 ProcessEngineConfiguration
+        ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
+                .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
+                .setJdbcUsername("root")
+                .setJdbcPassword("foobared")
+                .setJdbcDriver("com.mysql.cj.jdbc.Driver")
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        // 获取流程引擎对象
+        ProcessEngine processEngine = cfg.buildProcessEngine();
+        TaskService taskService = processEngine.getTaskService();
+        // 这里是需要修改流程定义的，指定默认的处理人 lisi
+        List<Task> list = taskService.createTaskQuery()
+                .processDefinitionKey("holidayRequest")
+                .taskAssignee("lisi")
+                .list();
+        for (Task task : list) {
+            System.out.println("task.getProcessDefinitionId() = " + task.getProcessDefinitionId());
+            System.out.println("task.getId() = " + task.getId());
+            System.out.println("task.getAssignee() = " + task.getAssignee());
+            System.out.println("task.getName() = " + task.getName());
+        }
+    }
+
+    /**
+     * 完成任务
+     */
+    @Test
+    public void testCompleteTask(){
+        // 配置数据库相关信息 获取 ProcessEngineConfiguration
+        ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
+                .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
+                .setJdbcUsername("root")
+                .setJdbcPassword("foobared")
+                .setJdbcDriver("com.mysql.cj.jdbc.Driver")
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        // 获取流程引擎对象
+        ProcessEngine processEngine = cfg.buildProcessEngine();
+        TaskService taskService = processEngine.getTaskService();
+        Task task = taskService.createTaskQuery()
+                .processDefinitionKey("holidayRequestNew")
+                .taskAssignee("lisi")
+                .singleResult();
+        // 添加流程变量
+        Map<String,Object> variables = new HashMap<>();
+        variables.put("approved",false); // 拒绝请假
+        // 完成任务
+        taskService.complete(task.getId(),variables);
+    }
+
+    /**
+     * 删除流程
+     */
+    @Test
+    public void testDeleteProcess(){
+        // 配置数据库相关信息 获取 ProcessEngineConfiguration
+        ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
+                .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
+                .setJdbcUsername("root")
+                .setJdbcPassword("foobared")
+                .setJdbcDriver("com.mysql.cj.jdbc.Driver")
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        // 获取流程引擎对象
+        ProcessEngine processEngine = cfg.buildProcessEngine();
+        RepositoryService repositoryService = processEngine.getRepositoryService();
+        // 删除流程定义，如果该流程定义已经有了流程实例启动则删除时报错
+        // repositoryService.deleteDeployment("1");
+        // 设置为TRUE 级联删除流程定义，及时流程有实例启动，也可以删除，设置为false 非级联删除操作。
+        repositoryService.deleteDeployment("2501",true);
+
+    }
+
+    /**
+     * 查看历史
+     */
+    @Test
+    public void testQueryHistory(){
+        // 配置数据库相关信息 获取 ProcessEngineConfiguration
+        ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
+                .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
+                .setJdbcUsername("root")
+                .setJdbcPassword("foobared")
+                .setJdbcDriver("com.mysql.cj.jdbc.Driver")
+                .setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+        // 获取流程引擎对象
+        ProcessEngine processEngine = cfg.buildProcessEngine();
+        HistoryService historyService = processEngine.getHistoryService();
+        List<HistoricActivityInstance> list = historyService.createHistoricActivityInstanceQuery()
+                .processDefinitionId("holidayRequestNew:1:10003")
+                .finished()
+                .orderByHistoricActivityInstanceEndTime().asc()
+                .list();
+        for (HistoricActivityInstance historicActivityInstance : list) {
+            System.out.println(historicActivityInstance.getActivityId() + " took "
+                    + historicActivityInstance.getDurationInMillis() + " milliseconds");
+        }
+
     }
 
 }
