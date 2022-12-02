@@ -17,13 +17,13 @@ import java.util.Map;
  * @author 29794
  * @date 2022/11/7 10:03
  */
-public class ProcessTest {
+class ProcessTest {
 
     /**
      * 部署流程
      */
     @Test
-    public void testDeploy() {
+    void testDeploy() {
         // 配置数据库相关信息 获取 ProcessEngineConfiguration
         ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
                 .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
@@ -48,7 +48,7 @@ public class ProcessTest {
      * 查看流程定义
      */
     @Test
-    public void testDeployQuery(){
+    void testDeployQuery() {
         // 配置数据库相关信息 获取 ProcessEngineConfiguration
         ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
                 .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
@@ -75,7 +75,7 @@ public class ProcessTest {
      * 启动流程实例
      */
     @Test
-    public void testRunProcess(){
+    void testRunProcess() {
         // 配置数据库相关信息 获取 ProcessEngineConfiguration
         ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
                 .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
@@ -88,10 +88,10 @@ public class ProcessTest {
         // 启动流程实例通过 RuntimeService 对象
         RuntimeService runtimeService = processEngine.getRuntimeService();
         // 构建流程变量
-        Map<String,Object> variables = new HashMap<>();
-        variables.put("employee","张三") ;// 谁申请请假
-        variables.put("nrOfHolidays",3); // 请几天假
-        variables.put("description","工作累了，想出去玩玩"); // 请假的原因
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("employee", "张三");// 谁申请请假
+        variables.put("nrOfHolidays", 3); // 请几天假
+        variables.put("description", "工作累了，想出去玩玩"); // 请假的原因
         // 启动流程实例，第一个参数是流程定义的id
         ProcessInstance processInstance = runtimeService
                 .startProcessInstanceByKey("holidayRequest", variables);// 启动流程实例
@@ -105,7 +105,7 @@ public class ProcessTest {
      * 查看任务
      */
     @Test
-    public void testQueryTask(){
+    void testQueryTask() {
         // 配置数据库相关信息 获取 ProcessEngineConfiguration
         ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
                 .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
@@ -133,7 +133,7 @@ public class ProcessTest {
      * 完成任务
      */
     @Test
-    public void testCompleteTask(){
+    void testCompleteTask() {
         // 配置数据库相关信息 获取 ProcessEngineConfiguration
         ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
                 .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
@@ -149,17 +149,17 @@ public class ProcessTest {
                 .taskAssignee("lisi")
                 .singleResult();
         // 添加流程变量
-        Map<String,Object> variables = new HashMap<>();
-        variables.put("approved",false); // 拒绝请假
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("approved", false); // 拒绝请假
         // 完成任务
-        taskService.complete(task.getId(),variables);
+        taskService.complete(task.getId(), variables);
     }
 
     /**
      * 删除流程
      */
     @Test
-    public void testDeleteProcess(){
+    void testDeleteProcess() {
         // 配置数据库相关信息 获取 ProcessEngineConfiguration
         ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
                 .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
@@ -173,7 +173,7 @@ public class ProcessTest {
         // 删除流程定义，如果该流程定义已经有了流程实例启动则删除时报错
         // repositoryService.deleteDeployment("1");
         // 设置为TRUE 级联删除流程定义，及时流程有实例启动，也可以删除，设置为false 非级联删除操作。
-        repositoryService.deleteDeployment("2501",true);
+        repositoryService.deleteDeployment("2501", true);
 
     }
 
@@ -181,7 +181,7 @@ public class ProcessTest {
      * 查看历史
      */
     @Test
-    public void testQueryHistory(){
+    void testQueryHistory() {
         // 配置数据库相关信息 获取 ProcessEngineConfiguration
         ProcessEngineConfiguration cfg = new StandaloneProcessEngineConfiguration()
                 .setJdbcUrl("jdbc:mysql://localhost:3306/flowable_lecture?serverTimezone=UTC&nullCatalogMeansCurrent=true")
